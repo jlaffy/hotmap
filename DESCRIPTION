@@ -1,0 +1,14 @@
+Package: hotmap
+Version: 0.0.0.9000
+Title: Plot Pretty Easy Heatmaps In R
+Description: Plots (clustered) heatmaps / correlation matrices, with flexible labelling. Uses ggplot2::geom_raster. 
+Authors@R: person("Julie", "Laffy", , "jlaffy7@gmail.com", c("aut", "cre"))
+License: CC0
+Encoding: UTF-8
+LazyData: true
+ByteCompile: true
+Imports: 
+    ggplot2,
+    reshape2,
+    hcluster
+RoxygenNote: 6.0.1
