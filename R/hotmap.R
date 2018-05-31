@@ -228,7 +228,8 @@ hotmap <- function(mat,
     ggplot2::scale_fill_gradient2(limits=limits,
                                   low=cols[1],
                                   mid=cols[2],
-                                  high=cols[3]) +
+                                  high=cols[3],
+                                  oob=scales::squish) +
     ggplot2::scale_x_discrete(name=x.name, breaks=x.breaks, labels=x.labels) +
     ggplot2::scale_y_discrete(name=y.name, breaks=y.breaks, labels=y.labels) +
     ggplot2::ggtitle(label=title) +
