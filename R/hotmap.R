@@ -263,7 +263,7 @@ hotmap <- function(mat,
 # ==================
 # epic package function
 # ==================
-#' Plot hotmap
+#' Plot hotmap2
 #' @param mat matrix to be plotted
 #'
 #' @param melted TRUE if matrix in tidy format
