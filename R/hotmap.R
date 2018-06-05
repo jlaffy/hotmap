@@ -6,6 +6,13 @@ colours <- function() {
   c("deepskyblue2", "white", "orangered2")
 }
 
+
+colours2 <- function() {
+  # http://colorbrewer2.org/#type=diverging&scheme=RdBu&n=11
+  # note [11:1] to get blue (low) to red (high)
+    c('#67001f','#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac','#053061')[11:1]
+}
+
 #' Tick (break) positions
 #'
 #' @param levels chr vector of (x or y) variables in correct order
@@ -230,6 +237,135 @@ hotmap <- function(mat,
                                   mid=cols[2],
                                   high=cols[3],
                                   oob=scales::squish) +
+    ggplot2::scale_x_discrete(name=x.name, breaks=x.breaks, labels=x.labels) +
+    ggplot2::scale_y_discrete(name=y.name, breaks=y.breaks, labels=y.labels) +
+    ggplot2::ggtitle(label=title) +
+    ggplot2::theme(aspect.ratio=ratio,
+                   plot.title=element_text(hjust=title.hjust),
+                   axis.text.y=element_text(size=y.ticksize),
+                   axis.text.x=element_text(size=x.ticksize),
+                   plot.margin=unit(margins, "pt"),
+                   legend.position=legend.position,
+                   panel.border=panel.border) +
+    ggplot2::geom_text(aes(x=-Inf, y=-Inf, hjust=0, vjust=0), label=bl.label, size=label.size) +
+    ggplot2::geom_text(aes(x=Inf, y=-Inf, hjust=1, vjust=0), label=br.label, size=label.size) +
+    ggplot2::geom_text(aes(x=-Inf, y=Inf, hjust=0, vjust=1), label=tl.label, size=label.size) +
+    ggplot2::geom_text(aes(x=Inf, y=Inf, hjust=1, vjust=1), label=tr.label, size=label.size)
+
+  if (isTRUE(return.data)) {
+    return(list(plot=p, data=mat))
+  } else {
+    p
+  }
+}
+
+
+# ==================
+# epic package function
+# ==================
+#' Plot hotmap
+#' @param mat matrix to be plotted
+#'
+#' @param melted TRUE if matrix in tidy format
+#' @param x axis
+#' @param y axis
+#' @param fill value
+#' @param x.order order of variables on x axis
+#' @param y.order order of variables on x axis
+#' @param order do not x.order or y.order if FALSE
+#' @param limits colour limits
+#' @param cols colours
+#' @param title plot
+#' @param x.breaks tick mark positions
+#' @param x.labels tick mark labels
+#' @param x.name axis label
+#' @param x.labels.by tick spaces
+#' @param x.labels.numeric convert labels to numbering
+#' @param y.breaks tick mark positions
+#' @param y.labels tick mark labels
+#' @param y.name axis label
+#' @param y.labels.by tick spaces
+#' @param y.labels.numeric convert labels to numbering
+#' @param title.hjust adjust title position. 0.5 is middle
+#' @param legend.position hide or display key and if so where
+#' @param panel.border show plot border, if so which
+#' @param margins border space around plot: c(x,x,x,x)
+#' @param ratio aspect ratio of x and y axis
+#' @param x.ticksize tick label size
+#' @param y.ticksize tick label size
+#' @param bl.label add text on plot bottom left
+#' @param br.label add text on plot bottom right
+#' @param tl.label add text on plot top left
+#' @param tr.label add text on plot top right
+#' @param label.size text size
+#'
+#' @import ggplot2
+#' @export
+hotmap2 <- function(mat,
+                   melted=FALSE,
+                   return.data=FALSE,
+                   x=NULL,
+                   y=NULL,
+                   fill=NULL,
+                   x.order=TRUE,
+                   y.order=TRUE,
+                   order=TRUE,
+                   limits=c(-10,10),
+                   cols=colours2(),
+                   title="",
+                   x.breaks=waiver(),
+                   x.labels=waiver(),
+                   x.name=NULL,
+                   x.labels.by=NULL,
+                   x.labels.numeric=FALSE,
+                   y.breaks=waiver(),
+                   y.labels=waiver(),
+                   y.name=NULL,
+                   y.labels.by=NULL,
+                   y.labels.numeric=FALSE,
+                   title.hjust=0.5,
+                   legend.position="none",
+                   panel.border=element_blank(),
+                   margins=c(0,0,0,0),
+                   ratio=1,
+                   x.ticksize=6,
+                   y.ticksize=6,
+                   bl.label="",
+                   br.label="",
+                   tl.label="",
+                   tr.label="",
+                   label.size=0.1){
+
+  # Check / Prepare data
+  if (!isTRUE(melted)) {
+    mat <- hotmap_prep(mat=mat, x.order=x.order, y.order=y.order, order=order)
+  }
+  if (is.null(x)) x <- mat$Var1
+  if (is.null(y)) y <- mat$Var2
+  if (is.null(fill)) fill <- mat$value
+
+  # Breaks and labels
+  x.bl <- hotmap_break_label(levels=levels(x),
+                             breaks=x.breaks,
+                             labels=x.labels,
+                             by=x.labels.by,
+                             labels.numeric=x.labels.numeric)
+  x.breaks <- x.bl$breaks
+  x.labels <- x.bl$labels
+  y.bl <- hotmap_break_label(levels=levels(y),
+                             breaks=y.breaks,
+                             labels=y.labels,
+                             by=y.labels.by,
+                             labels.numeric=y.labels.numeric)
+  y.breaks <- y.bl$breaks
+  y.labels <- y.bl$labels
+
+  # Plot heatmap
+  p <- ggplot2::ggplot() +
+    ggplot2::geom_tile(data=mat, aes(x=x, y=y, fill=fill)) +
+    ggplot2::scale_fill_gradientn(colours = cols,
+                                  limits = limits,
+                                  oob = scales::squish) +
     ggplot2::scale_x_discrete(name=x.name, breaks=x.breaks, labels=x.labels) +
     ggplot2::scale_y_discrete(name=y.name, breaks=y.breaks, labels=y.labels) +
     ggplot2::ggtitle(label=title) +
