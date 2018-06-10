@@ -90,10 +90,10 @@ hotmap_order <- function(mat, x.order=TRUE, y.order=TRUE, order=TRUE) {
 
   if (any(sapply(orders, isTRUE)) || any(sapply(orders, is.character))) {
     if (is.character(x.order)) mat <- mat[, x.order]
-    else if (isTRUE(x.order)) mat <- mat[, hcluster::hcorder(mat)]
+    else if (isTRUE(x.order)) mat <- mat[, statistrics::hcorder(mat)]
 
     if (is.character(y.order)) mat <- mat[y.order, ]
-    else if (isTRUE(y.order)) mat <- mat[hcluster::hcorder(t(mat)), ]
+    else if (isTRUE(y.order)) mat <- mat[statistrics::hcorder(t(mat)), ]
   }
 
   mat
